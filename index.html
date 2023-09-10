@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AR Application</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.2.1/aframe/build/aframe-ar.js"></script>
+</head>
+<body style="margin : 0px; overflow: hidden;">
+    <a-scene id="scene" embedded arjs="detectionMode: mono_and_matrix; matrixCodeType: 3x3; sourceType: webcam; debugUIEnabled: false;">
+        <!-- Define your AR content here -->
+        <a-marker type="barcode" value="1" emitevents="true" id="tracker-1">
+            <a-entity id="dashboard-1">
+                <a-video src="AR-Content_SAmerica.mp4" width="4.0" height="2.25" transparent="true" rotation="90 0 0"></a-video>
+                <a-box position="1 0.5 0" color="red" width="1" height="1" depth="1"></a-box>
+            </a-entity>
+        </a-marker>
+
+        <a-marker type="barcode" value="2" emitevents="true" id="tracker-2">
+            <a-entity id="dashboard-2">
+                <a-video src="AR-Content-D.mp4" width="4.0" height="2.25" transparent="true" rotation="90 0 0"></a-video>
+                <a-box position="1 0.5 0" color="blue" width="1" height="1" depth="1"></a-box>
+            </a-entity>
+        </a-marker>
+
+        <a-entity camera position="0 0 5"></a-entity>
+
+        <a-entity id="persistent-dashboard-1">
+        </a-entity>
+        <a-entity id="persistent-dashboard-2">
+        </a-entity>
+    </a-scene>
+    <script>
+        function setupTrackerAndDashboard(trackerName, dashboardName, persistentDashboardName) {
+            const tracker = document.getElementById(trackerName);
+            const dashboard = document.getElementById(dashboardName);
+            const persistentDashboard = document.getElementById(persistentDashboardName);
+
+            tracker.addEventListener("markerFound", (event) => {
+                console.log("markerFound");
+
+                tracker.object3D.add(dashboard.object3D);
+            });
+            tracker.addEventListener("markerLost", (event) => {
+                console.log("markerLost");
+
+                persistentDashboard.object3D.position.copy(
+                    tracker.object3D.position);
+                    persistentDashboard.object3D.rotation.copy(
+                    tracker.object3D.rotation);
+                    persistentDashboard.object3D.add(dashboard.object3D);
+            }, true);
+        }
+
+        setupTrackerAndDashboard("tracker-1", "dashboard-1", "persistent-dashboard-1");
+        setupTrackerAndDashboard("tracker-2", "dashboard-2", "persistent-dashboard-2");
+    </script>
+</body>
+</html>
